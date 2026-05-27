@@ -1,5 +1,8 @@
 const ref = db.ref("categoria");
 
+let idcapturado = null; //variável global para armazenar o ID do cliente que está sendo editado
+$("#cancelar").hide(); //esconde o botão de cancelar inicialmente
+
 $("#salvar").click(function (){
     let nome = $("#nome").val().toUpperCase();
     let informacao = $("#informacao").val().toUpperCase();
@@ -9,7 +12,17 @@ $("#salvar").click(function (){
         return;
      }
 
-    ref.push({ nome, informacao });
+     if(idcapturado){//editar
+        ref.child(idcapturado).update({nome, informacao});
+        idcapturado = null;
+        $("#salvar").text("Salvar");
+        $("#cancelar").hide();
+        $("#salvar").removeClass("btn-success").addClass("btn-primary");
+        $("#status").text("Registro atualizado!");
+     }
+     else{//salvar
+      ref.push({ nome, informacao });
+     }
 
      limpar();
 
@@ -43,7 +56,7 @@ $("#lista").append(`
                 </button>
             </td>
               <td>
-                <button class="btn btn-success btn-sm">
+                <button class="btn btn-info btn-sm" onclick="editar('${id}','${reg.nome}','${reg.informacao}')">
                     <i class="bi bi-pencil"></i>
                 </button>
             </td>
@@ -58,4 +71,19 @@ function limpar(){
     $("#nome").val("");
     $("#informacao").val("");
     $("#nome").focus();
+}
+
+function editar(id, nome, informacao){
+    $("#nome").val(nome);
+    $("#informacao").val(informacao);
+    idcapturado = id;
+
+    $("#cancelar").show(); //mostra o botão de cancelar quando estiver editando
+
+    $("#salvar")
+    .text("Atualizar")
+    .removeClass("btn-primary")
+    .addClass("btn-success");
+
+    $("#status").text("Editando registro...");
 }

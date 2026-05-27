@@ -1,5 +1,8 @@
 const ref = db.ref("fornecedores");
 
+let idcapturado = null; //variável global para armazenar o ID do cliente que está sendo editado
+$("#cancelar").hide(); //esconde o botão de cancelar inicialmente
+
 $("#salvar").click(function (){
     let nome = $("#nome").val().toUpperCase();
     let cnpj = $("#cnpj").val();
@@ -11,7 +14,19 @@ $("#salvar").click(function (){
         return;
      }
 
+     if(idcapturado){//editar
+        ref.child(idcapturado).update({nome, cnpj , email , estados});
+        idcapturado = null;
+        $("#salvar").text("Salvar");
+
+        $("#cancelar").hide();
+        $("#salvar").removeClass("btn-success").addClass("btn-primary");
+        $("#status").text("Registro atualizado!");
+     }
+     else{
+
     ref.push({ nome, cnpj , email , estados });
+     }
 
      limpar();
 
@@ -49,7 +64,7 @@ $("#lista").append(`
                 </button>
             </td>
               <td>
-                <button class="btn btn-success btn-sm">
+                <button class="btn btn-info btn-sm" onclick="editar('${id}','${reg.nome}','${reg.email}','${reg.cnpj}','${reg.estados}')">
                     <i class="bi bi-pencil"></i>
                 </button>
             </td>
@@ -65,4 +80,22 @@ function limpar(){
     $("#email").val("");
     $("input[name = 'estados']").prop("checked", false);
     $("#nome").focus();
+}
+
+function editar(id, nome, email, cnpj, estados){ //vem do botão de editar, recebe o id, nome e email do cliente que foi clicado para edição
+    $("#nome").val(nome);
+    $("#email").val(email);
+    $("#cnpj").val(cnpj);
+    $(`input[name='estados'][value='${estados}']`).prop("checked", true);
+    idcapturado = id;
+
+    
+    $("#cancelar").show(); //mostra o botão de cancelar quando estiver editando
+
+    $("#salvar")
+    .text("Atualizar")
+    .removeClass("btn-primary")
+    .addClass("btn-success");
+
+    $("#status").text("Editando registro...");
 }

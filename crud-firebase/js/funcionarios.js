@@ -1,20 +1,21 @@
-const ref = db.ref("clientes");
+const ref = db.ref("funcionarios");
 
 
-let idcapturado = null; //variável global para armazenar o ID do cliente que está sendo editado
+let idcapturado = null; //variável global para armazenar o ID do funcionário que está sendo editado
 $("#cancelar").hide(); //esconde o botão de cancelar inicialmente
 
 $("#salvar").click(function (){
     let nome = $("#nome").val().toUpperCase();
     let email = $("#email").val().toLowerCase();
+    let cargo = $("#cargo").val().toUpperCase();
 
-    if(nome === "" || email === ""){
+    if(nome === "" || email === "" || cargo === ""){
         alert('Preencha todos os campos');//verifica se tem od dados no formulario
         return;
      }
 
      if(idcapturado){//editar
-        ref.child(idcapturado).update({nome, email});//atualiza o cliente com o ID capturado
+        ref.child(idcapturado).update({nome, email, cargo});//atualiza o funcionário com o ID capturado
         idcapturado = null;//limpa a variável para não interferir em futuras operações de edição
         $("#salvar").text("Salvar");//volta o texto do botão para "Salvar"
 
@@ -23,7 +24,7 @@ $("#salvar").click(function (){
          $("#status").text("Registro atualizado!");
      }
      else{//salvar
-      ref.push({ nome, email });//salva tudo 
+      ref.push({ nome, email, cargo });//salva tudo 
      }
 
      limpar();
@@ -41,6 +42,7 @@ $("#lista").append(`
         <th>ID</th>
         <th>Nome</th>
         <th>Email</th>
+        <th>cargo</th>
         <th colspan="2">Opções</th>
     </tr>
     `);
@@ -55,13 +57,14 @@ $("#lista").append(`
             <td>${id}</td>
             <td>${reg.nome}</td>
             <td>${reg.email}</td>
+            <td>${reg.cargo}</td>
             <td>
                 <button class="btn btn-danger btn-sm">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
               <td>
-                <button class="btn btn-info btn-sm" onclick="editar('${id}','${reg.nome}','${reg.email}')">
+                <button class="btn btn-info btn-sm" onclick="editar('${id}','${reg.nome}','${reg.email}','${reg.cargo}')">
                     <i class="bi bi-pencil"></i>
                 </button>
             </td>
@@ -73,12 +76,14 @@ $("#lista").append(`
 function limpar(){
     $("#nome").val("");
     $("#email").val("");
+    $("#cargo").val("");
     $("#nome").focus();
 }
 
-function editar(id, nome, email){ //vem do botão de editar, recebe o id, nome e email do cliente que foi clicado para edição
+function editar(id, nome, email, cargo){ //vem do botão de editar, recebe o id, nome, email e cargo do funcionário que foi clicado para edição
     $("#nome").val(nome);
     $("#email").val(email);
+    $("#cargo").val(cargo);
 
     idcapturado = id;
 
